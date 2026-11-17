@@ -1,4 +1,4 @@
-# NEXL-OS
+![NEXL OS Banner](banner.png)
 The Windows for Warehouse Robots - An operating layer for multi-robot intelligence
 
 ### 🚀 Live Demo: https://LarryRonex01.github.io/NEXL-OS/
