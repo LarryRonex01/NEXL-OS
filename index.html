@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NEXL OS v0.6 – warehouse robot simulator</title>
+<title>NEXL OS v0.5 – warehouse robot simulator</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap">
 <style>
 :root{--bg:#eceee9;--ink:#1b2024;--mut:#5d676e;--card:#fff;--line:#cdd3d1;--or:#d9500a;--cy:#0b7f92;--rd:#c4313a;--gn:#23773f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -81,7 +81,7 @@ canvas{border:1px solid rgba(0,229,255,.25)}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script></head>
 <body>
-<div class="top"><div>NEXL OS <b>v0.6</b> &nbsp;|&nbsp; <span>Moat: Optimized Routing</span></div><div class="tr"><button id="bPng">Export Proof PNG</button><span class="ok"><i class="pdot"></i>Operational</span></div></div>
+<div class="top"><div>NEXL OS <b>v0.5</b> &nbsp;|&nbsp; <span>Moat: Optimized Routing</span></div><div class="tr"><button id="bPng">Export Proof PNG</button><span class="ok"><i class="pdot"></i>Operational</span></div></div>
 <main>
 <h1>NEXL OS</h1>
 <p class="sub">Robots plan routes in space and time, so each one knows where the others will be a few seconds from now. Aisles are one-way, like a real fulfilment centre. Tap the floor to place a wall, or change the warehouse size.</p>
@@ -112,7 +112,7 @@ canvas{border:1px solid rgba(0,229,255,.25)}
    <div class="bar"><button id="pBuild" disabled>Build bot</button></div></div>
   <div class="card"><h2>Fleet Status</h2><div id="rl"></div></div>
   <div class="card"><h2>System Metrics</h2><div class="mx"><div><b id="mA">0/6</b><span>Active Robots</span></div><div><b id="mP">0</b><span>Pending Tasks</span></div><div><b id="mE">–</b><span>Efficiency</span></div></div><div class="lbl">Dedupe (tasks + parts): Cleaned <b id="tC">0</b> · Duplicates removed <b id="tD">0</b></div></div>
-  <div class="card"><h2>Fleet Intelligence v0.6</h2><div id="fi"></div></div>
+  <div class="card"><h2>Fleet Intelligence</h2><div id="fi"></div></div>
   <div class="card"><h2>Optimizer · Load Balancer</h2><div id="opt"></div></div>
   <div class="card"><h2>Live log</h2><div class="log" id="lg"></div></div>
  </div>
@@ -155,7 +155,7 @@ function build(i){
  DOCK=[{x:2,y:5},{x:2,y:H-4},{x:W-3,y:5},{x:W-3,y:H-4}];
  robots=[];tasks=[];ppl=[];heat=Array.from({length:H},()=>Array(W).fill(0));
  done=sumT=clock=step=acc=tid=EM=EW=taskClean=taskDup=0;trips=[];cross=new Map();tSaved=0;G={b:{n:0,w:0},u:{n:0,w:0}};AV=COL=tSaved5=0;HV={n:0,s:0};
- addRobot();addRobot();newTask();log('Controller','NEXL OS v0.6 started, floor '+W+'x'+H)}
+ addRobot();addRobot();newTask();log('Controller','NEXL OS v0.5 started, floor '+W+'x'+H)}
 
 /* one-way lanes: rows y%4==0 east, y%4==1 west; vertical aisles alternate south/north */
 function lane(x,y,dx,dy){
@@ -400,13 +400,14 @@ function buildBot(){
 function wrapTxt(g,t,w){const out=[];let l='';t.split(' ').forEach(wd=>{const n=l?l+' '+wd:wd;if(g.measureText(n).width>w&&l){out.push(l);l=wd}else l=n});if(l)out.push(l);return out}
 async function exportProofPng(){
  const b=$('bPng');b.disabled=true;
- const w=window.open('','_blank'); // opened inside the click so popup blockers allow it
- if(w)w.document.write('<body style="background:#0A1020;color:#8FA3BF;font:14px sans-serif;text-align:center"><p>Rendering proof PNG...</p>');
+ exportOverlay('Rendering proof PNG...'); // shown at once, no popup needed, so in-app browsers cannot block it
  try{
-  const shot=window.html2canvas?await html2canvas(document.body,{backgroundColor:'#0A1020',scale:Math.min(2,devicePixelRatio||1),logging:false}):(()=>{const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;c.getContext('2d').drawImage(cv,0,0);return c})();
+  let shot,note='';
+  try{if(!window.html2canvas)throw new Error('html2canvas not loaded');shot=await html2canvas(document.body,{backgroundColor:'#0A1020',scale:Math.min(2,devicePixelRatio||1),logging:false})}
+  catch(e){shot=document.createElement('canvas');shot.width=cv.width;shot.height=cv.height;shot.getContext('2d').drawImage(cv,0,0);note='Full dashboard capture is not available in this browser, so this PNG shows the warehouse map.'}
   const W2=shot.width,fs=Math.max(13,Math.round(W2/42)),pad=fs,sp=[...new Set(robots.map(r=>(r.spd||1).toFixed(1)))].sort(),pd=dupTotal+cleanBotParts(bin)[1],dup=pd+taskDup,
    l1='Robots '+robots.length+'/6 | Speeds '+sp.map(s=>s+'x').join(', ')+' | Delivered '+done+' | Duplicates removed '+dup+' (tasks '+taskDup+', parts '+pd+') | Time saved '+tSaved.toFixed(0)+'s',
-   l2='NEXL OS v0.6 - Optimized - '+fleetAvg().toFixed(1)+'x Fleet - Day 4 - Larry Ronex',
+   l2='NEXL OS v0.5 - Optimized - '+fleetAvg().toFixed(1)+'x Fleet - Day 4 - Larry Ronex',
    m=document.createElement('canvas').getContext('2d');
   m.font='600 '+fs+'px sans-serif';
   const t1=wrapTxt(m,l1,W2-pad*2),t2=wrapTxt(m,l2,W2-pad*2),lh=fs*1.4,H2=Math.round(pad*2.5+(t1.length+t2.length)*lh);
@@ -416,14 +417,21 @@ async function exportProofPng(){
   g.font='600 '+fs+'px sans-serif';g.textBaseline='top';let y=shot.height+pad;
   g.fillStyle='#00E5FF';t1.forEach(t=>{g.fillText(t,pad,y);y+=lh});y+=pad*.5;
   g.fillStyle='#8FA3BF';t2.forEach(t=>{g.fillText(t,pad,y);y+=lh});
-  const url=out.toDataURL('image/png'),fn='NEXL-OS-Proof-'+Date.now()+'.png';
-  if(w){w.document.open();w.document.write('<title>'+fn+'</title><body style="margin:0;background:#0A1020;color:#8FA3BF;font:14px sans-serif;text-align:center"><p style="margin:10px">Press and hold the image to save, or <a style="color:#00E5FF" download="'+fn+'" href="'+url+'">download</a></p><img src="'+url+'" style="max-width:100%">');w.document.close()}
-  else showImg(url) // popup blocked: show the image on this page instead
- }catch(e){if(w)w.close();log('Controller','PNG export failed: '+e.message)}
+  const blob=await new Promise((res,rej)=>out.toBlob(x=>x?res(x):rej(new Error('PNG encoding failed')),'image/png')),
+   fn='NEXL-OS-Proof-'+Date.now()+'.png';
+  exportOverlay(null,URL.createObjectURL(blob),blob,fn,note);
+ }catch(e){exportOverlay('Export failed: '+e.message)}
  b.disabled=false}
-function showImg(url){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;overflow:auto';
- d.innerHTML='<p style="margin:0;color:#8FA3BF;font-size:13px">Proof PNG ready. If the download did not start, press and hold the image to save. Tap outside to close.</p><img src="'+url+'" alt="NEXL OS proof" style="max-width:100%;max-height:80vh;border-radius:8px">';
- d.onclick=()=>d.remove();document.body.appendChild(d)}
+/* In-page result sheet: Save PNG (real download link), Share / Save to gallery (Web Share), Open in new tab, long-press on the image */
+function exportOverlay(msg,url,blob,fn,note){
+ let d=$('exo');if(!d){d=document.createElement('div');d.id='exo';d.style.cssText='position:fixed;inset:0;z-index:99;background:rgba(5,8,18,.93);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:16px;overflow:auto;text-align:center;color:#8FA3BF;font-size:13px';document.body.appendChild(d)}
+ const A='display:inline-block;padding:10px 16px;border:1px solid #00E5FF;border-radius:10px;color:#00E5FF;background:rgba(0,229,255,.08);text-decoration:none;font:inherit;cursor:pointer';
+ d.innerHTML=!url?'<p style="margin:0">'+msg+'</p><a id="exc" style="'+A+'">Close</a>':
+  (note?'<p style="margin:0;color:#FF8A00">'+note+'</p>':'')+'<img src="'+url+'" alt="NEXL OS proof PNG" style="max-width:100%;max-height:56vh;border-radius:8px;border:1px solid rgba(0,229,255,.3)">'+
+  '<div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center"><a href="'+url+'" download="'+fn+'" style="'+A+'">Save PNG</a><a id="exs" style="'+A+';display:none">Share / Save to gallery</a><a href="'+url+'" target="_blank" rel="noopener" style="'+A+'">Open in new tab</a><a id="exc" style="'+A+'">Close</a></div>'+
+  '<p style="margin:0;max-width:420px">If Save does nothing (Instagram and other in-app browsers block downloads): press and hold the image and choose Save image, or open this page in Chrome from the menu and export again.</p>';
+ $('exc').onclick=()=>d.remove();
+ if(url&&blob&&navigator.canShare){const f=new File([blob],fn,{type:'image/png'});if(navigator.canShare({files:[f]})){const s=$('exs');s.style.display='inline-block';s.onclick=()=>navigator.share({files:[f],title:'NEXL OS proof'}).catch(()=>{})}}}
 /* v0.6 optimizer panel + KPI cards */
 function optUI(){
  if(performance.now()-(optUI.t||0)<250)return;optUI.t=performance.now();
