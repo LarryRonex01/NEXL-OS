@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>NEXL OS – warehouse robot simulator</title>
+<title>NEXL OS v0.6 – warehouse robot simulator</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500&display=swap">
 <style>
 :root{--bg:#eceee9;--ink:#1b2024;--mut:#5d676e;--card:#fff;--line:#cdd3d1;--or:#d9500a;--cy:#0b7f92;--rd:#c4313a;--gn:#23773f;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -34,13 +34,61 @@ button.stop.on{background:var(--rd);color:#fff}
 .log{max-height:210px;overflow:auto;font-size:13px}
 .log p{margin:0;padding:3px 0;border-top:1px solid var(--line)}
 .t{font-weight:600}
-</style></head>
-<body><main>
+.top{background:#14181b;color:#e8ebe6;padding:10px 14px;font:600 16px "Barlow Condensed",sans-serif;letter-spacing:.8px;text-transform:uppercase}
+.top b{color:#ff7a2e}.top span{color:#3cc8dc}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0;min-height:26px}
+.chip{background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:13px}
+.chip.dup{border-color:var(--rd);color:var(--rd);text-decoration:line-through}.chip.ok{border-color:#00FF88;color:#00FF88}
+.badge{display:inline-block;background:var(--gn);color:#fff;border-radius:999px;padding:3px 10px;font-size:13px;font-weight:600;margin:2px 4px 2px 0}
+.badge.bad{background:var(--rd)}
+.lbl{color:var(--mut);font-size:13px;margin-top:8px}
+:root:root:root{--bg:#0A1020;--ink:#E6F1FF;--mut:#8FA3BF;--card:#101A30;--line:rgba(0,229,255,.18);--or:#FF8A00;--cy:#00E5FF;--rd:#FF4D5E;--gn:#00FF88;color-scheme:dark}
+canvas{border:1px solid rgba(0,229,255,.25)}
+.top{display:flex;justify-content:space-between;gap:10px;background:#070C18;border-bottom:1px solid rgba(0,229,255,.3);color:#00E5FF}
+.top b{color:#fff}.top span{color:#8FA3BF}.top .ok{color:#00E5FF}
+.fw{position:relative}
+.tag{position:absolute;width:9px;height:9px;border-radius:50%;background:currentColor;pointer-events:none;animation:blip 1.6s ease-in-out infinite}
+@keyframes blip{0%,100%{box-shadow:0 0 4px 1px currentColor;opacity:1}50%{box-shadow:0 0 10px 3px currentColor;opacity:.6}}
+.tag.in{left:3px;bottom:3px;color:#00FF88;border-color:#00FF88}
+.tag.out{right:3px;top:3px;color:#FF8A00;border-color:#FF8A00}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;margin-top:10px;padding:8px 12px;border:1px solid var(--line);border-radius:6px;background:var(--card);font-size:12px;color:var(--mut)}
+.legend b{color:var(--cy);text-transform:uppercase;letter-spacing:.8px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.fr{padding:7px 0;border-top:1px solid var(--line)}.fr:first-child{border-top:0}
+.fh{display:flex;justify-content:space-between;font-size:13px}
+.bb{height:6px;background:rgba(255,255,255,.1);border-radius:3px;margin:5px 0;overflow:hidden}.bb i{display:block;height:100%}
+.mx{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mx b{display:block;font:700 26px/1 "Barlow Condensed",sans-serif;color:var(--cy)}.mx span{color:var(--mut);font-size:12px}
+.foot{display:flex;flex-wrap:wrap;gap:6px 18px;padding:10px 14px;border-top:1px solid var(--line);background:#070C18;font-size:12px;color:var(--mut)}
+.foot b{color:var(--ink)}.foot span:first-child{color:#00FF88}
+.tr{display:flex;align-items:center;gap:12px}.tr button{padding:4px 10px;font-size:12px}
+.kpi{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:0 0 14px}@media(max-width:560px){.kpi{grid-template-columns:repeat(2,1fr)}}
+.kpi div{background:var(--card);border:1px solid var(--line);border-radius:6px;padding:8px 10px}.kpi b{display:block;font:700 24px/1 "Barlow Condensed",sans-serif;color:var(--cy)}.kpi span{color:var(--mut);font-size:12px}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}.dot.g{background:#00FF88;box-shadow:0 0 6px #00FF88}
+.top{text-shadow:0 0 8px rgba(0,229,255,.75);box-shadow:0 2px 18px rgba(0,229,255,.22)}
+.top b{text-shadow:0 0 10px #00E5FF}
+.pdot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#00E5FF;margin-right:7px;animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 6px 2px rgba(0,229,255,.9),0 0 0 0 rgba(0,229,255,.8);opacity:1}50%{box-shadow:0 0 12px 4px rgba(0,229,255,.9),0 0 0 7px rgba(0,229,255,0);opacity:.55}}
+@media (prefers-reduced-motion:reduce){.pdot,.tag,#pVal,#pBuild{animation:none}}
+.top .ok{text-shadow:0 0 8px #00E5FF,0 0 16px rgba(0,229,255,.6)}
+#pVal:not(.bad){box-shadow:0 0 8px rgba(0,255,136,.6);animation:okglow 1.8s ease-in-out infinite}
+@keyframes okglow{0%,100%{box-shadow:0 0 4px rgba(0,255,136,.45)}50%{box-shadow:0 0 14px 3px rgba(0,255,136,.9)}}
+#pOrig .chip{background:#161b26;border-color:#2c3340;color:#9aa4b2}
+#pOrig .chip.dup{border-color:var(--rd);color:var(--rd)}
+#pClean .chip{border-color:#00FF88;color:#00FF88;box-shadow:0 0 8px rgba(0,255,136,.55),inset 0 0 6px rgba(0,255,136,.25)}
+#pBuild:not(:disabled){border-color:#00f0ff;color:#00f0ff;text-shadow:0 0 6px rgba(0,240,255,.8);box-shadow:0 0 10px rgba(0,240,255,.5);animation:buildpulse 2.6s ease-in-out infinite}
+@keyframes buildpulse{0%,100%{box-shadow:0 0 6px rgba(0,240,255,.35),inset 0 0 4px rgba(0,240,255,.15)}50%{box-shadow:0 0 18px 3px rgba(0,240,255,.8),inset 0 0 8px rgba(0,240,255,.3)}}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script></head>
+<body>
+<div class="top"><div>NEXL OS <b>v0.6</b> &nbsp;|&nbsp; <span>Moat: Optimized Routing</span></div><div class="tr"><button id="bPng">Export Proof PNG</button><span class="ok"><i class="pdot"></i>Operational</span></div></div>
+<main>
 <h1>NEXL OS</h1>
 <p class="sub">Robots plan routes in space and time, so each one knows where the others will be a few seconds from now. Aisles are one-way, like a real fulfilment centre. Tap the floor to place a wall, or change the warehouse size.</p>
+<div class="kpi"><div><b id="kA">0</b><span>Collisions Avoided</span></div><div><b id="kV">0%</b><span>Load Variance</span></div><div><b id="kS">1.0x</b><span>Fleet Avg Speed</span></div><div><b id="kC">100%</b><span>Parts Cleaned</span></div></div>
 <div class="wrap">
  <div class="floor">
-  <canvas id="c" aria-label="Warehouse floor simulation"></canvas>
+  <div class="fw"><canvas id="c" aria-label="Warehouse floor simulation"></canvas><span class="tag in" title="IN · Receiving Bay"></span><span class="tag out" title="OUT · Shipping Dock"></span></div>
   <div class="bar">
    <button id="bT">New task</button>
    <button id="bA">Auto tasks: on</button>
@@ -49,18 +97,46 @@ button.stop.on{background:var(--rd);color:#fff}
    <button id="bW">Clear walls</button>
    <button id="bH">Heatmap</button>
    <button id="bP">Drop person</button>
+   <button id="bO">Drop obstacle</button>
    <button id="bE" class="stop">Emergency stop</button>
   </div>
-  <p class="hint">Faint arrows = one-way lanes. Yellow = robot, red = waiting for others to pass, dashed line = timed route, cone = sensor view, green bar = battery, ⚡ = charging dock, pink dot = person.</p>
+  <div class="legend"><b>Legend</b><span><i style="background:#00E5FF"></i>R1</span><span><i style="background:#FF8A00"></i>R2 · OUT · ⚡ charging</span><span><i style="background:#00FF88"></i>IN receiving</span><span><i style="background:#FF4D5E"></i>waiting</span><span><i style="background:#ff4fa3"></i>person</span><span><i style="background:#FF4D5E"></i>2+ robots crossed (last 10)</span><span><i style="background:#00FF88"></i>clear</span><span>dashed = timed route · ‹ › = one-way lanes</span></div>
  </div>
  <div class="side">
   <div class="card"><div class="stats"><div><b id="sD">0</b><span>delivered</span></div><div><b id="sQ">0</b><span>in queue</span></div><div><b id="sR">0</b><span>robots</span></div><div><b id="sT">–</b><span>avg time (s)</span></div></div></div>
-  <div class="card"><h2>Robots</h2><div id="rl"></div></div>
+  <div class="card"><h2>Parts bin · NEXL-CORE</h2>
+   <div class="bar" style="margin-top:0"><button data-p="motor">+ motor</button><button data-p="sensor">+ sensor</button><button data-p="wheel">+ wheel</button><button id="pClr">Clear</button></div>
+   <div class="lbl">Original (<span id="oN">0</span>)</div><div class="chips" id="pOrig"></div>
+   <div class="lbl">Cleaned list (<span id="cN">0</span>) · Total duplicates removed (<span id="dN">0</span>)</div><div class="chips" id="pClean"></div>
+   <div class="lbl">Validation</div><div><span class="badge bad" id="pVal">–</span><span class="badge" id="pSave" style="display:none"></span></div>
+   <div class="bar"><button id="pBuild" disabled>Build bot</button></div></div>
+  <div class="card"><h2>Fleet Status</h2><div id="rl"></div></div>
+  <div class="card"><h2>System Metrics</h2><div class="mx"><div><b id="mA">0/6</b><span>Active Robots</span></div><div><b id="mP">0</b><span>Pending Tasks</span></div><div><b id="mE">–</b><span>Efficiency</span></div></div><div class="lbl">Dedupe (tasks + parts): Cleaned <b id="tC">0</b> · Duplicates removed <b id="tD">0</b></div></div>
+  <div class="card"><h2>Fleet Intelligence v0.6</h2><div id="fi"></div></div>
+  <div class="card"><h2>Optimizer · Load Balancer</h2><div id="opt"></div></div>
   <div class="card"><h2>Live log</h2><div class="log" id="lg"></div></div>
  </div>
 </div>
 </main>
+<footer class="foot"><span><i class="dot g"></i>Connection Secure</span><span>WebSocket <b>Live</b> (simulated)</span><span><b id="fL">–</b> ms latency</span><span>Last update <b id="fU">–</b></span><span>CPU <b id="fC">–</b></span><span>RAM <b id="fM">–</b></span></footer>
 <script>
+function cleanBotParts(parts) {
+  const seen = new Map();
+  const original = [];
+  let duplicates = 0;
+  for (const part of parts) {
+    if (seen.has(part)) duplicates++;
+    else { seen.set(part, true); original.push(part); }
+  }
+  return [original.length, duplicates, original];
+}
+var taskClean=0,taskDup=0; // task-level dedupe counters: accepted vs duplicate (same weight already open)
+var trips=[],cross=new Map(),tSaved=0,G={b:{n:0,w:0},u:{n:0,w:0}};
+var AV=0,COL=0,HV={n:0,s:0},tSaved5=0,partsClean=0; // v0.6 optimizer: conflicts avoided, real collisions, heavy-parcel speed, modelled time saved
+function fleetAvg(){return robots.length?robots.reduce((a,r)=>a+(r.spd||1),0)/robots.length:1}
+function loadVar(){const c=robots.map(r=>r.n),m=c.reduce((a,b)=>a+b,0)/(c.length||1);return m?Math.sqrt(c.reduce((a,b)=>a+(b-m)*(b-m),0)/c.length)/m*100:0} // std dev / mean of delivered counts // v0.6: last-10-delivery routes, time saved, wait stats (b = base bots, u = upgraded)
+function pushTrip(r){trips.push({id:r.id,cells:r.vis||new Set()});if(trips.length>10)trips.shift();
+ cross=new Map();trips.forEach(t=>t.cells.forEach(k=>{let s=cross.get(k);if(!s)cross.set(k,s=new Set());s.add(t.id)}))} // cell -> robots that crossed it
 const cv=document.getElementById('c'),g=cv.getContext('2d'),$=id=>document.getElementById(id);
 const STEP=.28,TAG={Fleet:'var(--or)',Planner:'var(--cy)',Controller:'var(--gn)',Perception:'var(--ink)',Safety:'var(--rd)'};
 let W,H,S,grid,PICK,DROP,HOME,DOCK,robots,tasks,heat,ppl,done,sumT,clock,step,acc,tid,logs=[],sz=0,estop=false,auto=true,showHeat=false;
@@ -76,10 +152,10 @@ function build(i){
  PICK=[];DROP=[];
  for(let y=0;y<H;y++)if(y%4==1||y==H-1){PICK.push({x:1,y});DROP.push({x:W-2,y})}
  HOME=[3,7,11].map(y=>({x:2,y})).concat([3,7,11].map(y=>({x:W-3,y})));
- DOCK=[{x:2,y:2},{x:2,y:11},{x:18,y:2},{x:18,y:11}];
+ DOCK=[{x:2,y:5},{x:2,y:H-4},{x:W-3,y:5},{x:W-3,y:H-4}];
  robots=[];tasks=[];ppl=[];heat=Array.from({length:H},()=>Array(W).fill(0));
- done=sumT=clock=step=acc=tid=0;
- addRobot();addRobot();newTask();log('Controller','NEXL OS started, floor '+W+'x'+H)}
+ done=sumT=clock=step=acc=tid=EM=EW=taskClean=taskDup=0;trips=[];cross=new Map();tSaved=0;G={b:{n:0,w:0},u:{n:0,w:0}};AV=COL=tSaved5=0;HV={n:0,s:0};
+ addRobot();addRobot();newTask();log('Controller','NEXL OS v0.6 started, floor '+W+'x'+H)}
 
 /* one-way lanes: rows y%4==0 east, y%4==1 west; vertical aisles alternate south/north */
 function lane(x,y,dx,dy){
@@ -163,10 +239,11 @@ function addRobot(){
 
 function newTask(){
  const a=PICK[Math.random()*PICK.length|0],b=DROP[Math.random()*DROP.length|0],kg=5+(Math.random()*45|0);
- tasks.push({id:++tid,a,b,r:null,kg,c:clock});log('Fleet','Task #'+tid+' created ('+kg+' kg)')}
+ if(tasks.some(o=>o.kg===kg)){taskDup++;log('Controller','Duplicate removed: a '+kg+' kg task is already open');return}
+ taskClean++;tasks.push({id:++tid,a,b,r:null,kg,c:clock});log('Fleet','Task #'+tid+' created ('+kg+' kg)')}
 
 function advance(){
- step++;clock+=STEP;
+ step++;clock+=STEP;robots.forEach(r=>{if(mover(r)){if(r.blocked){EW++;r.wt=(r.wt||0)+1}else EM++}});
  for(let i=ppl.length;i--;)if((ppl[i].ttl-=STEP)<0){ppl.splice(i,1);log('Perception','Person left the aisle')}
  if(auto&&Math.random()<STEP*.35&&tasks.filter(t=>!t.r).length<3)newTask();
   const later=[];
@@ -174,32 +251,38 @@ function advance(){
   const i=step-r.t0,pr=r.at;r.pv=pr;
   if(i<r.plan.length){
    const c=r.plan[i];
-   if((c.x!=pr.x||c.y!=pr.y)&&robots.some(o=>{if(o===r)return false;const q=cellAt(o,step);return q.x==c.x&&q.y==c.y})){later.push(r);r.blocked=true;return}
-   if((c.x!=pr.x||c.y!=pr.y)&&ppl.some(q=>q.x==c.x&&q.y==c.y)){log('Perception','R'+r.id+' sees a person, re-planning');later.push(r);r.blocked=true;return}
+   if((c.x!=pr.x||c.y!=pr.y)&&robots.some(o=>{if(o===r)return false;const q=cellAt(o,step);return q.x==c.x&&q.y==c.y})){if(!r.wf)AV++;r.wf=true;later.push(r);r.blocked=true;return}
+   if((c.x!=pr.x||c.y!=pr.y)&&ppl.some(q=>q.x==c.x&&q.y==c.y)){r.rr=clock+2;log('Perception','R'+r.id+' sees a person, re-routing');later.push(r);r.blocked=true;return}
    r.at=c;const mv=c.x!=pr.x||c.y!=pr.y;
-   if(mv){r.dir=Math.atan2(c.y-pr.y,c.x-pr.x);heat[c.y][c.x]++}
+   if(mv){r.dir=Math.atan2(c.y-pr.y,c.x-pr.x);heat[c.y][c.x]++;r.vis&&r.vis.add(c.x+','+c.y);r.mf=pr;r.ms=step;r.mm=r.mc}
    else if(r.state!='idle')heat[c.y][c.x]+=2;
-   r.blocked=!mv&&r.state!='idle'&&(c.x!=r.goal.x||c.y!=r.goal.y)}})
+   r.blocked=!mv&&r.state!='idle'&&(c.x!=r.goal.x||c.y!=r.goal.y);
+   const wt=r.blocked&&!(r.mm>1&&step-r.ms<r.mm);if(wt&&!r.wf)AV++;r.wf=wt}})
  robots.forEach(r=>{
   if(later.includes(r)){replan(r);return}
   const pr=r.pv;
   if(mover(r)&&(r.at.x!=r.goal.x||r.at.y!=r.goal.y)){r.stk=(r.at.x!=pr.x||r.at.y!=pr.y)?0:r.stk+1;if(r.stk>=9){r.stk=0;escape(r)}}else r.stk=0;
   if(r.state=='idle'){r.blocked=false;return}
-  if(r.state=='charging'){r.blocked=false;r.ct-=STEP;if(r.ct<=0){r.bat=100;r.state='idle';log('Fleet','R'+r.id+' charged to 100%')}return}
+  if(r.state=='charging'){r.blocked=false;r.ct-=STEP;if(r.ct<=0){r.bat=r.bmax||100;r.state='idle';log('Fleet','R'+r.id+' charged to '+r.bat+'%')}return}
   const end=step-r.t0>=r.plan.length-1;
   if(end&&r.at.x==r.goal.x&&r.at.y==r.goal.y){
-   if(r.state=='pickup'){r.state='drop';r.goal=r.task.b;r.mc=r.task.kg>25?2:1;replan(r);log('Controller','R'+r.id+' picked up '+r.task.kg+' kg'+(r.mc>1?' (heavy, moves slower)':''))}
-   else if(r.state=='drop'){done++;sumT+=clock-r.task.c;r.n++;tasks.splice(tasks.indexOf(r.task),1);r.task=null;r.mc=1;r.bat=Math.max(0,r.bat-1);
+   if(r.state=='pickup'){r.state='drop';r.goal=r.task.b;r.mc=r.task.kg>(r.cap||25)&&(r.spd||1)<1.39?2:1;replan(r);log('Controller','R'+r.id+' picked up '+r.task.kg+' kg'+(r.mc>1?' (heavy, moves slower)':''))}
+   else if(r.state=='drop'){done++;sumT+=clock-r.task.c;r.n++;const dt=clock-(r.ts??clock),sp=r.spd||1;tSaved+=(sp-1)*dt;r.tt=(r.tt||0)+dt;{const gp=G[sp>1?'u':'b'];gp.n++;gp.w+=(r.wt||0)*STEP}pushTrip(r);if(r.task.kg>25){HV.n++;HV.s+=sp;tSaved5+=dt*(sp/fleetAvg()-1)}tasks.splice(tasks.indexOf(r.task),1);r.task=null;r.mc=1;r.bat=Math.max(0,r.bat-1);
     if(r.bat<20){r.state='charge';r.goal=nearestDock(r);replan(r);log('Fleet','R'+r.id+' battery '+r.bat+'%, going to charge')}
     else{r.state='park';r.goal=r.home;replan(r);log('Controller','R'+r.id+' delivered, heading home')}}
    else if(r.state=='charge'){r.state='charging';r.ct=3;log('Fleet','R'+r.id+' charging at dock')}
    else r.state='idle'}
   else if(end&&(step+r.id)%6==0)replan(r)});
+ for(let i=0;i<robots.length;i++)for(let j=i+1;j<robots.length;j++){const a=robots[i],b=robots[j]; // real collision check: same cell, or swapped cells
+  if((a.at.x==b.at.x&&a.at.y==b.at.y)||(a.at.x==b.pv.x&&a.at.y==b.pv.y&&b.at.x==a.pv.x&&b.at.y==a.pv.y&&(a.at.x!=a.pv.x||a.at.y!=a.pv.y)))COL++}
  tasks.filter(t=>!t.r).forEach(t=>{
   if(tasks.some(o=>o.r&&(o.a===t.a||o.b===t.b)))return;
+  const load=r=>r.n+(r.task?1:0),minL=Math.min(...robots.map(load)),heavy=t.kg>25;
   let best=null,bd=1e9;
-  robots.forEach(r=>{if(r.state=='idle'&&r.bat>=20){const d=Math.abs(r.at.x-t.a.x)+Math.abs(r.at.y-t.a.y);if(d<bd){bd=d;best=r}}});
-  if(best){t.r=best;best.task=t;best.state='pickup';best.goal=t.a;best.mc=1;replan(best);log('Fleet','Task #'+t.id+' goes to R'+best.id)}});
+  robots.forEach(r=>{if(r.state=='idle'&&r.bat>=20){const d=Math.abs(r.at.x-t.a.x)+Math.abs(r.at.y-t.a.y),
+   k=load(r)>minL+1?1e6+load(r):(heavy?-(r.spd||1)*1000:0)+d/(r.spd||1); // 1) stay inside the load-balance band, 2) heavy parcels go to the fastest robot, 3) nearest
+   if(k<bd){bd=k;best=r}}});
+  if(best){t.r=best;best.task=t;best.state='pickup';best.goal=t.a;best.mc=1;best.ts=clock;best.wt=0;best.vis=new Set([best.at.x+','+best.at.y]);replan(best);log('Fleet','Task #'+t.id+' goes to R'+best.id)}});
 }
 
 function zone(p,c,l){g.fillStyle=c;g.globalAlpha=.22;g.fillRect(p.x*S,p.y*S,S,S);g.globalAlpha=1;
@@ -208,31 +291,40 @@ function zone(p,c,l){g.fillStyle=c;g.globalAlpha=.22;g.fillRect(p.x*S,p.y*S,S,S)
 
 function draw(){
  const f=estop?0:Math.min(1,acc/STEP);
- g.fillStyle='#20262b';g.fillRect(0,0,cv.width,cv.height);
- g.strokeStyle='#2b343a';g.lineWidth=1;
+ g.fillStyle='#0A1020';g.fillRect(0,0,cv.width,cv.height);
+ g.strokeStyle='rgba(0,229,255,0.15)';g.lineWidth=1;
  for(let i=0;i<=W;i++){g.beginPath();g.moveTo(i*S,0);g.lineTo(i*S,H*S);g.stroke()}
  for(let j=0;j<=H;j++){g.beginPath();g.moveTo(0,j*S);g.lineTo(W*S,j*S);g.stroke()}
- g.fillStyle='rgba(255,255,255,.16)';g.font=(S/2|0)+'px Barlow,sans-serif';g.textAlign='center';
+ g.fillStyle='rgba(0,229,255,.3)';g.font=(S/2|0)+'px Barlow,sans-serif';g.textAlign='center';
  for(let y=0;y<H;y++)for(let x=4;x<=W-5;x++)if(!grid[y][x]){
   const v=(x-8)%5==0&&y%4>=2;
   if(!v&&y%4<2)g.fillText(y%4==1?'‹':'›',x*S+S/2,y*S+S/2+4);
   else if(v)g.fillText(((x-8)/5)%2==0?'˅':'˄',x*S+S/2,y*S+S/2+4)}
- PICK.forEach(p=>zone(p,'#3cc8dc','IN'));DROP.forEach(p=>zone(p,'#ff7a2e','OUT'));DOCK.forEach(p=>zone(p,'#52c97a','⚡'));
+ PICK.forEach(p=>zone(p,'#00FF88','IN'));DROP.forEach(p=>zone(p,'#FF8A00','OUT'));DOCK.forEach(p=>zone(p,'#FF8A00','⚡'));
+ if(showHeat)for(let y=0;y<H;y++)for(let x=0;x<W;x++){if(grid[y][x])continue;const n=(cross.get(x+','+y)||{size:0}).size; // v0.6 traffic overlay: red = 2+ robots crossed in last 10 deliveries, green = clear
+  g.fillStyle=n>=2?'rgba(255,77,94,'+Math.min(.5,.16+.08*(n-2))+')':n==1?'rgba(0,255,136,.12)':'rgba(0,255,136,.05)';g.fillRect(x*S,y*S,S,S)}
  if(showHeat){let m=1;heat.forEach(a=>a.forEach(v=>m=Math.max(m,v)));for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(heat[y][x]>0){g.fillStyle='rgba(255,59,59,'+(.12+.65*heat[y][x]/m)+')';g.fillRect(x*S,y*S,S,S)}}
  for(let y=0;y<H;y++)for(let x=0;x<W;x++){
-  if(grid[y][x]==1){g.fillStyle='#3a454c';g.fillRect(x*S+1,y*S+1,S-2,S-2);g.fillStyle='#4d5b63';g.fillRect(x*S+5,y*S+5,S-10,S-10)}
-  if(grid[y][x]==2){g.fillStyle='#ff7a2e';g.fillRect(x*S+3,y*S+3,S-6,S-6);g.fillStyle='#20262b';g.fillRect(x*S+S/2-2,y*S+6,4,S-12)}}
+  if(grid[y][x]==1){g.fillStyle='#16223d';g.fillRect(x*S+1,y*S+1,S-2,S-2);g.fillStyle='#22345a';g.fillRect(x*S+5,y*S+5,S-10,S-10)}
+  if(grid[y][x]==2){g.fillStyle='#FF8A00';g.fillRect(x*S+3,y*S+3,S-6,S-6);g.fillStyle='#0A1020';g.fillRect(x*S+S/2-2,y*S+6,4,S-12)}}
  robots.forEach(r=>{
   const pl=r.plan.slice(Math.max(0,step-r.t0));if(pl.length<2)return;
-  g.strokeStyle='#3cc8dc';g.lineWidth=2;g.setLineDash([5,4]);g.beginPath();g.moveTo(r.at.x*S+S/2,r.at.y*S+S/2);
-  pl.forEach(p=>g.lineTo(p.x*S+S/2,p.y*S+S/2));g.stroke();g.setLineDash([])});
+  const rr=clock<r.rr;g.strokeStyle=rr?'#FF4D5E':RC[(r.id-1)%6];g.lineWidth=rr?3.5:2;g.setLineDash([5,4]);g.lineDashOffset=rr?-(performance.now()/30%9):0;g.shadowColor=rr?'#FF4D5E':RC[(r.id-1)%6];g.shadowBlur=rr?14:10;g.beginPath();g.moveTo(r.at.x*S+S/2,r.at.y*S+S/2);
+  pl.forEach(p=>g.lineTo(p.x*S+S/2,p.y*S+S/2));g.stroke();g.setLineDash([]);g.shadowBlur=0;g.lineDashOffset=0});
  robots.forEach(r=>{
-  const x=(r.pv.x+(r.at.x-r.pv.x)*f)*S,y=(r.pv.y+(r.at.y-r.pv.y)*f)*S;
-  g.fillStyle='rgba(60,200,220,.12)';g.beginPath();g.moveTo(x+S/2,y+S/2);g.arc(x+S/2,y+S/2,3*S,r.dir-Math.PI/2,r.dir+Math.PI/2);g.fill();
-  g.fillStyle=r.blocked?'#e5484d':'#f2b705';g.fillRect(x+4,y+4,S-8,S-8);
-  g.fillStyle='#14181b';g.fillRect(x+4,y+S-7,S-8,5);g.fillStyle=r.bat>50?'#52c97a':r.bat>=20?'#f2b705':'#e5484d';g.fillRect(x+4,y+S-6,(S-8)*r.bat/100,3);
-  if(r.state=='drop'){g.fillStyle='#ff7a2e';g.fillRect(x+S/2-4,y+S/2-4,8,8)}
-  g.fillStyle='#14181b';g.font='700 '+(S/3|0)+'px Barlow,sans-serif';g.textAlign='center';g.fillText('R'+r.id,x+S/2,y+S/2-1)});
+  let ax=r.pv.x+(r.at.x-r.pv.x)*f,ay=r.pv.y+(r.at.y-r.pv.y)*f;
+  if(r.mm>1&&step-r.ms<r.mm){const p=Math.min(1,(step-r.ms+f)/r.mm);ax=r.mf.x+(r.at.x-r.mf.x)*p;ay=r.mf.y+(r.at.y-r.mf.y)*p}
+  const x=ax*S,y=ay*S;
+  g.fillStyle='rgba(0,229,255,.10)';g.beginPath();g.moveTo(x+S/2,y+S/2);g.arc(x+S/2,y+S/2,3*S,r.dir-Math.PI/2,r.dir+Math.PI/2);g.fill();
+  const tc=RC[(r.id-1)%6];r.tr=r.tr||[];const lp=r.tr[r.tr.length-1];
+  if(!lp||Math.abs(lp.x-x)+Math.abs(lp.y-y)>3){r.tr.push({x,y});if(r.tr.length>12)r.tr.shift()}else if(!mover(r)&&r.tr.length)r.tr.shift();
+  if(r.tr.length>1){g.save();g.lineCap='round';g.strokeStyle=tc;for(let i=1;i<r.tr.length;i++){const a=i/r.tr.length,p0=r.tr[i-1],p1=r.tr[i];g.beginPath();g.moveTo(p0.x+S/2,p0.y+S/2);g.lineTo(p1.x+S/2,p1.y+S/2);g.globalAlpha=.16*a;g.lineWidth=8;g.stroke();g.globalAlpha=.55*a;g.lineWidth=2.5;g.stroke()}g.restore()}
+  if(clock<r.rr){g.strokeStyle='#FF4D5E';g.lineWidth=2;g.beginPath();g.arc(x+S/2,y+S/2,S*(.62+.2*Math.sin(performance.now()/90)),0,7);g.stroke()}
+  g.fillStyle=r.blocked?'#FF4D5E':RC[(r.id-1)%6];g.fillRect(x+4,y+4,S-8,S-8);
+  g.fillStyle='#14181b';g.fillRect(x+4,y+S-7,S-8,5);const bc=r.bat>50?'#00FF88':r.bat>=20?'#FF8A00':'#FF4D5E';g.shadowColor=bc;g.shadowBlur=6;g.fillStyle=bc;g.fillRect(x+4,y+S-6,(S-8)*r.bat/100,3);g.shadowBlur=0;
+  if(r.state=='drop'){g.fillStyle='#fff';g.fillRect(x+S/2-4,y+S/2-4,8,8)}
+  g.fillStyle='#14181b';g.font='700 '+(S/3|0)+'px Barlow,sans-serif';g.textAlign='center';g.fillText('R'+r.id,x+S/2,y+S/2-1);
+  if(r.spd){const t=r.spd.toFixed(1)+'x',by=y>S/3?y-2:y+S+S/3;g.font='700 '+(S/3.2|0)+'px Barlow,sans-serif';g.lineWidth=3;g.strokeStyle='#0A1020';g.strokeText(t,x+S/2,by);g.fillStyle='#FFD60A';g.fillText(t,x+S/2,by)}});
  ppl.forEach(q=>{g.fillStyle='#ff4fa3';g.beginPath();g.arc(q.x*S+S/2,q.y*S+S/2,S*.3,0,7);g.fill()});
  if(estop){g.fillStyle='rgba(229,72,77,.28)';g.fillRect(0,0,cv.width,cv.height);g.fillStyle='#fff';g.font='700 30px "Barlow Condensed",sans-serif';g.textAlign='center';g.fillText('EMERGENCY STOP',cv.width/2,cv.height/2)}
 }
@@ -240,15 +332,112 @@ function draw(){
 function panel(){
  $('sD').textContent=done;$('sQ').textContent=tasks.filter(t=>!t.r).length;$('sR').textContent=robots.length;$('sT').textContent=done?(sumT/done).toFixed(0):'–';
  const L={idle:'idle',pickup:'going to pick up',drop:'carrying load',park:'returning home',charge:'going to charge',charging:'charging'};
- $('rl').innerHTML=robots.map(r=>'<div class="rb"><b>R'+r.id+'</b><span>'+(estop?'stopped':r.blocked?'waiting':L[r.state])+' · '+r.bat.toFixed(0)+'% · '+r.n+' done</span></div>').join('')}
+ if(performance.now()-(panel.t||0)<250)return;panel.t=performance.now();
+ $('rl').innerHTML=robots.map(r=>{const rc=RC[(r.id-1)%6],eta=mover(r)&&(r.at.x!=r.goal.x||r.at.y!=r.goal.y)?Math.max(0,r.plan.length-1-(step-r.t0))*STEP:0;
+  return'<div class="fr"><div class="fh"><b style="color:'+rc+'">R'+r.id+'</b><span>'+(estop?'stopped':r.blocked?'waiting':L[r.state])+(eta?' · ETA '+eta.toFixed(0)+'s':'')+'</span></div><div class="bb"><i style="width:'+r.bat+'%;background:'+(r.bat<20?'#FF4D5E':rc)+';box-shadow:0 0 8px '+(r.bat<20?'#FF4D5E':rc)+'"></i></div><div class="fh"><span>'+r.bat.toFixed(0)+'%</span><span>'+r.n+' done'+(r.spd?' · '+r.spd.toFixed(1)+'x · '+r.cap+'kg':'')+'</span></div></div>'}).join('');
+ $('mA').textContent=robots.filter(mover).length+'/6';$('mP').textContent=tasks.filter(t=>!t.r).length;{const q=tasks.filter(t=>!t.r).length,tg=done+q?done/(done+q)*100:0;EF+=(tg-EF)*.35;$('mE').textContent=Math.round(EF)+'%';$('tC').textContent=taskClean+partsClean;$('tD').textContent=taskDup+dupTotal+cleanBotParts(bin)[1]}
+  if(robots.length){const spd=r=>r.spd||1,fast=robots.reduce((a,b)=>spd(b)>spd(a)||(spd(b)===spd(a)&&b.n>a.n)?b:a),
+   ef=robots.filter(r=>r.n>0&&r.tt>0).reduce((a,b)=>!a||b.tt/b.n<a.tt/a.n?b:a,null),
+   wb=G.b.n?G.b.w/G.b.n:null,wu=G.u.n?G.u.w/G.u.n:null,wr=wb>0&&wu!=null?(wb-wu)/wb*100:null,
+   rw=(k,v)=>'<div class="fr"><div class="fh"><span>'+k+'</span><b>'+v+'</b></div></div>';
+   $('fi').innerHTML=rw('Fastest Robot','R'+fast.id+' - '+spd(fast).toFixed(1)+'x')+rw('Most Efficient',ef?'R'+ef.id+' - '+spd(ef).toFixed(1)+'x ('+(ef.tt/ef.n).toFixed(0)+'s/trip)':'–')+
+    rw('Total Time Saved',tSaved.toFixed(0)+' s over '+done+' deliveries')+rw('Avg Wait Time Reduced',wr==null?'– (needs both bot types)':(wr>=0?'-':'+')+Math.abs(wr).toFixed(0)+'% ('+wb.toFixed(1)+'s → '+wu.toFixed(1)+'s)')}
+ $('fL').textContent=LAT.toFixed(1);$('fC').textContent=CPU.toFixed(0)+'%';$('fU').textContent=new Date().toLocaleTimeString();
+ $('fM').textContent=performance.memory?Math.round(performance.memory.usedJSHeapSize/1048576)+' MB':'n/a'}
 
 cv.addEventListener('click',e=>{
  const b=cv.getBoundingClientRect(),x=((e.clientX-b.left)/b.width*W)|0,y=((e.clientY-b.top)/b.height*H)|0;
  if(x<0||y<0||x>=W||y>=H||grid[y][x]==1||[...PICK,...DROP,...HOME,...DOCK].some(p=>p.x==x&&p.y==y))return;
- if(robots.some(r=>(r.at.x==x&&r.at.y==y)||r.plan.some(p=>p.x==x&&p.y==y)&&r.state!='idle'&&false))return;
- if(robots.some(r=>r.at.x==x&&r.at.y==y))return;
- grid[y][x]=grid[y][x]?0:2;DC.clear();
- robots.forEach(r=>{if(r.state!='idle')replan(r)})});
+ if(robots.some(r=>r.at.x==x&&r.at.y==y)||ppl.some(q=>q.x==x&&q.y==y))return;
+ const was=grid[y][x];grid[y][x]=was?0:2;DC.clear();
+ if(!was&&!connected()){grid[y][x]=0;DC.clear();log('Perception','Wall rejected: it would cut off a pick-up, drop-off, home or dock');return}
+ log('Perception',was?'Wall removed':'Wall placed at '+x+','+y);
+ robots.forEach(r=>{if(r.state!='idle'){const hit=!was&&r.plan.slice(Math.max(0,step-r.t0)).some(p=>p.x==x&&p.y==y);replan(r);if(hit){r.rr=clock+2;log('Planner','R'+r.id+' re-routing around the new wall')}}})});
+
+/* every pick-up, drop-off, home and dock must stay reachable after a wall is placed */
+function connected(){const k=p=>p.x+','+p.y,seen=new Set([k(DROP[0])]),q=[DROP[0]];
+ for(let i=0;i<q.length;i++)for(const[dx,dy]of DIRS){const n={x:q[i].x+dx,y:q[i].y+dy};
+  if(n.x<0||n.y<0||n.x>=W||n.y>=H||grid[n.y][n.x]||seen.has(k(n)))continue;seen.add(k(n));q.push(n)}
+ return[...PICK,...DROP,...HOME,...DOCK].every(p=>seen.has(k(p)))}
+
+/* NEXL-CORE v0.5 */
+function clean_bot_parts(parts){const seen=new Map(),original=[],duplicates=[];for(const p of parts){if(seen.has(p))duplicates.push(p);else{seen.set(p,1);original.push(p)}}return{original,duplicates}}
+function validate_bot(parts){const m=['motor','sensor','wheel'].filter(p=>!parts.includes(p));return m.length?[false,'Missing: '+m.join(', ')]:[true,'Bot OK']}
+let bin=[],EM=0,EW=0,EF=0,LAT=0,CPU=0;const RC=['#00E5FF','#FF8A00','#00FF88','#7C9CFF','#C77DFF','#FF5DA2'];
+const chips=(a,orig)=>{const s=new Set();return a.map(p=>{const d=orig&&s.has(p);s.add(p);return'<span class="chip'+(d?' dup':orig?'':' ok')+'">'+p+'</span>'}).join('')};
+function runCore(){
+ const [,saved,cleaned]=cleanBotParts(bin),[ok,msg]=validate_bot(cleaned);
+ $('pOrig').innerHTML=chips(bin,true);$('pClean').innerHTML=chips(cleaned);
+ $('oN').textContent=bin.length;$('cN').textContent=cleaned.length;$('dN').textContent=dupTotal+saved+taskDup;
+ const v=$('pVal');v.textContent=msg;v.className='badge'+(ok?'':' bad');
+ const s=$('pSave');s.style.display=saved>0?'inline-block':'none';
+ s.textContent='cost_saved = '+saved+' · '+Math.round(saved/bin.length*100)+'% cost saved';
+ $('pBuild').disabled=!ok;
+ return{cleaned,ok,msg,saved}}
+document.querySelectorAll('[data-p]').forEach(b=>b.onclick=()=>{if(!bin.includes(b.dataset.p))partsClean++;bin.push(b.dataset.p);const r=runCore();
+ log('Controller','Part dropped: '+b.dataset.p+' → '+r.msg+(r.saved?' · '+r.saved+' duplicate removed':''))});
+$('pClr').onclick=()=>{dupTotal+=cleanBotParts(bin)[1];bin=[];runCore();log('Controller','Parts bin cleared')};
+let nextId=0,dupTotal=0;
+function buildBot(){
+ const [,,cleaned]=cleanBotParts(bin);
+ if(!validate_bot(cleaned)[0]){log('Controller','Need motor+sensor+wheel');return}
+ const n=k=>bin.filter(p=>p===k).length,m=n('motor'),s=n('sensor'),w=n('wheel');
+ const spd=Math.round((1+w*0.2)*10)/10,batt=99+s*2,cap=20+m*5;
+ let home=HOME[robots.length],old=null;
+ if(robots.length>=6){
+  old=robots.reduce((a,b)=>((a.spd||1)-(b.spd||1)||a.n-b.n)<=0?a:b);
+  if(spd<(old.spd||1)||(spd===(old.spd||1)&&cap<=(old.cap||25))){log('Controller','No upgrade: R'+old.id+' ('+(old.spd||1).toFixed(1)+'x '+(old.cap||25)+'kg) is not slower than this bot ('+spd.toFixed(1)+'x '+cap+'kg)');return}
+  home=old.home}
+ nextId=Math.max(nextId,...robots.map(r=>r.id))+1;
+ const id=nextId;
+ if(old){tasks.forEach(t=>{if(t.r===old)t.r=null});robots.splice(robots.indexOf(old),1);
+  log('Fleet','Upgrading R'+old.id+' -> R'+id+' ['+spd.toFixed(1)+'x '+cap+'kg '+batt+'%]')}
+ else log('Controller','Bot built: motor('+m+') sensor('+s+') wheel('+w+') -> R'+id+' ['+spd.toFixed(1)+'x '+cap+'kg]');
+ robots.push({id,at:home,pv:home,home,plan:[home],t0:step,goal:home,state:'idle',task:null,bat:batt,bmax:batt,spd,cap,chg:false,ct:0,stk:0,mc:1,dir:0,n:0,blocked:false});
+ if(!tasks.some(t=>!t.r))newTask();
+ dupTotal+=cleanBotParts(bin)[1];bin=[];runCore()}
+/* Export Proof PNG: screenshot of the whole dashboard + proof strip + watermark */
+function wrapTxt(g,t,w){const out=[];let l='';t.split(' ').forEach(wd=>{const n=l?l+' '+wd:wd;if(g.measureText(n).width>w&&l){out.push(l);l=wd}else l=n});if(l)out.push(l);return out}
+async function exportProofPng(){
+ const b=$('bPng');b.disabled=true;
+ const w=window.open('','_blank'); // opened inside the click so popup blockers allow it
+ if(w)w.document.write('<body style="background:#0A1020;color:#8FA3BF;font:14px sans-serif;text-align:center"><p>Rendering proof PNG...</p>');
+ try{
+  const shot=window.html2canvas?await html2canvas(document.body,{backgroundColor:'#0A1020',scale:Math.min(2,devicePixelRatio||1),logging:false}):(()=>{const c=document.createElement('canvas');c.width=cv.width;c.height=cv.height;c.getContext('2d').drawImage(cv,0,0);return c})();
+  const W2=shot.width,fs=Math.max(13,Math.round(W2/42)),pad=fs,sp=[...new Set(robots.map(r=>(r.spd||1).toFixed(1)))].sort(),pd=dupTotal+cleanBotParts(bin)[1],dup=pd+taskDup,
+   l1='Robots '+robots.length+'/6 | Speeds '+sp.map(s=>s+'x').join(', ')+' | Delivered '+done+' | Duplicates removed '+dup+' (tasks '+taskDup+', parts '+pd+') | Time saved '+tSaved.toFixed(0)+'s',
+   l2='NEXL OS v0.6 - Optimized - '+fleetAvg().toFixed(1)+'x Fleet - Day 4 - Larry Ronex',
+   m=document.createElement('canvas').getContext('2d');
+  m.font='600 '+fs+'px sans-serif';
+  const t1=wrapTxt(m,l1,W2-pad*2),t2=wrapTxt(m,l2,W2-pad*2),lh=fs*1.4,H2=Math.round(pad*2.5+(t1.length+t2.length)*lh);
+  const out=document.createElement('canvas');out.width=W2;out.height=shot.height+H2;const g=out.getContext('2d');
+  g.fillStyle='#0A1020';g.fillRect(0,0,out.width,out.height);g.drawImage(shot,0,0);
+  g.fillStyle='#070C18';g.fillRect(0,shot.height,W2,H2);g.fillStyle='#00E5FF';g.fillRect(0,shot.height,W2,2);
+  g.font='600 '+fs+'px sans-serif';g.textBaseline='top';let y=shot.height+pad;
+  g.fillStyle='#00E5FF';t1.forEach(t=>{g.fillText(t,pad,y);y+=lh});y+=pad*.5;
+  g.fillStyle='#8FA3BF';t2.forEach(t=>{g.fillText(t,pad,y);y+=lh});
+  const url=out.toDataURL('image/png'),fn='NEXL-OS-Proof-'+Date.now()+'.png';
+  if(w){w.document.open();w.document.write('<title>'+fn+'</title><body style="margin:0;background:#0A1020;color:#8FA3BF;font:14px sans-serif;text-align:center"><p style="margin:10px">Press and hold the image to save, or <a style="color:#00E5FF" download="'+fn+'" href="'+url+'">download</a></p><img src="'+url+'" style="max-width:100%">');w.document.close()}
+  else showImg(url) // popup blocked: show the image on this page instead
+ }catch(e){if(w)w.close();log('Controller','PNG export failed: '+e.message)}
+ b.disabled=false}
+function showImg(url){const d=document.createElement('div');d.style.cssText='position:fixed;inset:0;z-index:99;background:rgba(0,0,0,.8);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:16px;overflow:auto';
+ d.innerHTML='<p style="margin:0;color:#8FA3BF;font-size:13px">Proof PNG ready. If the download did not start, press and hold the image to save. Tap outside to close.</p><img src="'+url+'" alt="NEXL OS proof" style="max-width:100%;max-height:80vh;border-radius:8px">';
+ d.onclick=()=>d.remove();document.body.appendChild(d)}
+/* v0.6 optimizer panel + KPI cards */
+function optUI(){
+ if(performance.now()-(optUI.t||0)<250)return;optUI.t=performance.now();
+ const fa=fleetAvg(),lv=loadVar(),hv=HV.n?HV.s/HV.n:null,cl=cleanBotParts(bin)[2],
+  left=(cl.length-new Set(cl).size)+(tasks.length-new Set(tasks.map(t=>t.kg)).size),tot=cl.length+tasks.length,pc=tot?(1-left/tot)*100:100,
+  rw=(k,v)=>'<div class="fr"><div class="fh"><span>'+k+'</span><b>'+v+'</b></div></div>';
+ $('kA').textContent=AV;$('kV').textContent=lv.toFixed(0)+'%';$('kS').textContent=fa.toFixed(1)+'x';$('kC').textContent=pc.toFixed(0)+'%';$('dN').textContent=dupTotal+cleanBotParts(bin)[1]+taskDup; // same total as the System Metrics line
+ $('opt').innerHTML=rw('Routing (space-time A*)','Avoided '+AV+' · Actual collisions '+COL)
+  +rw('Load Balancer: ON','Variance '+lv.toFixed(0)+'% (target ±10%)')
+  +rw('Delivered per robot',robots.map(r=>'R'+r.id+':'+r.n).join(' '))
+  +rw('Fleet Avg Speed',fa.toFixed(1)+'x'+(hv==null?'':' · heavy parcels '+hv.toFixed(1)+'x (was '+fa.toFixed(1)+'x)'))
+  +rw('Time saved vs v0.5',tSaved5.toFixed(0)+' s (modelled, heavy parcels)')}
+$('pBuild').onclick=buildBot;$('bPng').onclick=exportProofPng;
+runCore();
 
 $('bT').onclick=newTask;
 $('bR').onclick=addRobot;
@@ -256,11 +445,22 @@ $('bS').onclick=e=>{sz=(sz+1)%3;e.target.textContent='Size: '+'SML'[sz];build(sz
 $('bA').onclick=e=>{auto=!auto;e.target.textContent='Auto tasks: '+(auto?'on':'off')};
 $('bW').onclick=()=>{for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(grid[y][x]==2)grid[y][x]=0;DC.clear();log('Perception','All walls cleared')};
 $('bH').onclick=e=>{showHeat=!showHeat;e.target.textContent=showHeat?'Heatmap: on':'Heatmap'};
-$('bP').onclick=()=>{for(let i=0;i<80;i++){const x=Math.random()*W|0,y=Math.random()*H|0;if(!grid[y][x]&&!robots.some(r=>r.at.x==x&&r.at.y==y)){ppl.push({x,y,ttl:12});log('Perception','A person walked into the aisle');break}}};
+/* a free cell 3 steps ahead on a moving robot's route, so drops land where the robot will see them */
+function aheadCell(){
+ for(const r of robots){if(!mover(r))continue;const k=step-r.t0+3;if(k<1||k>=r.plan.length-1)continue;const c=r.plan[k];
+  if(grid[c.y][c.x]||[...PICK,...DROP,...HOME,...DOCK].some(p=>p.x==c.x&&p.y==c.y)||robots.some(o=>o.at.x==c.x&&o.at.y==c.y)||ppl.some(q=>q.x==c.x&&q.y==c.y))continue;
+  return{r,x:c.x,y:c.y}}
+ return null}
+$('bO').onclick=()=>{const a=aheadCell();if(!a){log('Perception','No robot on the move to block, tap the floor to place a wall');return}
+ const b=cv.getBoundingClientRect();cv.dispatchEvent(new MouseEvent('click',{clientX:b.left+(a.x+.5)/W*b.width,clientY:b.top+(a.y+.5)/H*b.height}))};
+$('bP').onclick=()=>{const a=aheadCell();
+ if(a){ppl.push({x:a.x,y:a.y,ttl:12});log('Perception','A person walked into R'+a.r.id+"'s aisle");
+  robots.forEach(o=>{if(mover(o)&&o.plan.slice(Math.max(0,step-o.t0)).some(p=>p.x==a.x&&p.y==a.y)){o.rr=clock+2;log('Perception','R'+o.id+' sees a person, re-routing');replan(o)}});return}
+ for(let i=0;i<80;i++){const x=Math.random()*W|0,y=Math.random()*H|0;if(!grid[y][x]&&!robots.some(r=>r.at.x==x&&r.at.y==y)){ppl.push({x,y,ttl:12});log('Perception','A person walked into the aisle');break}}};
 $('bE').onclick=e=>{estop=!estop;e.target.classList.toggle('on',estop);e.target.textContent=estop?'Release stop':'Emergency stop';log('Safety',estop?'Emergency stop pressed, all robots halted':'Stop released')};
 
 function tick(dt){if(estop)return;acc+=dt;while(acc>=STEP){acc-=STEP;advance()}}
 build(0);
 let last=performance.now();
-(function loop(n){requestAnimationFrame(loop);try{const dt=Math.min(.1,(n-last)/1000);last=n;tick(dt);draw();panel()}catch(err){console.error(err)}})(last);
+(function loop(n){requestAnimationFrame(loop);try{const t0=performance.now(),dt=Math.min(.1,(n-last)/1000);last=n;tick(dt);draw();panel();optUI();LAT=performance.now()-t0;CPU=Math.min(100,LAT/Math.max(1,dt*1000)*100)}catch(err){console.error(err)}})(last);
 </script></body></html>
