@@ -1,3 +1,5 @@
+![NEXL OS](banner.png)
+
 # NEXL OS v0.5 — The Windows for Warehouse Robots
 
 > An operating layer for multi-robot intelligence. Self-healing, collision-free, payload-aware.
